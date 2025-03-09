@@ -76,6 +76,29 @@ class PollResultsView(APIView):
         except Poll.DoesNotExist:
             return Response({"detail": "Poll not found."}, status=status.HTTP_404_NOT_FOUND)
 
+class PollFinalResultsView(APIView):
+    def get(self, request, poll_id):
+        try:
+            poll = Poll.objects.get(id=poll_id)
+            options = poll.options.all()
+            
+            # Count votes for each option
+            option_votes = [(option, option.votes.count()) for option in options]
+            
+            # Get the highest number of votes
+            max_votes = max(option_votes, key=lambda x: x[1])[1]
+            
+            # Filter options with the highest votes
+            highest_voted_options = [
+                OptionSerializer(option, context={'include_votes': True}).data
+                for option, votes in option_votes if votes == max_votes
+            ]
+            
+            return Response(highest_voted_options, status=status.HTTP_200_OK)
+        
+        except Poll.DoesNotExist:
+            return Response({"detail": "Poll not found."}, status=status.HTTP_404_NOT_FOUND)
+
 class PollUpdateView(generics.UpdateAPIView):
     queryset = Poll.objects.all()
     serializer_class = PollSerializer

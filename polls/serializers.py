@@ -72,3 +72,14 @@ class OptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Option
         fields = ['id', 'text']
+    
+    def to_representation(self, instance):
+        # Get the default representation
+        representation = super().to_representation(instance)
+        
+        # Check if we are in the context of the poll results view and add the votes field
+        if self.context.get('include_votes', False):
+            representation['votes'] = instance.votes.count()
+        
+        return representation
+
