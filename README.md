@@ -1,10 +1,6 @@
-Certainly! Below is a comprehensive and industry-standard `README.md` template that covers everything we’ve done for your project. This includes setup, usage, configuration, and explanations for the implemented features.
-
----
-
 # Poll System Backend
 
-This is the backend for the **Poll System** API, developed using **Django** and **Django Rest Framework** (DRF), with JWT authentication for user login and vote functionality. The system allows users to create polls, vote on options, and retrieve poll results.
+This is the backend for the **Poll System** API, Built in completion of the ALX ProDevs Program, it is developed using **Django** and **Django Rest Framework** (DRF) ans PostgreSQL, with JWT authentication for user login and vote functionality. The system allows users to create polls, vote on options, and retrieve poll results.
 
 ## Features
 
