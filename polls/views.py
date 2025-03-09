@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound
-
 from rest_framework.views import APIView
 from .models import Poll, Option  # Import Option model
 from .serializers import UserSerializer, PollSerializer, LoginSerializer, OptionSerializer, VoteSerializer
@@ -36,7 +35,6 @@ class LoginView(generics.GenericAPIView):
                 })
             return Response({"message": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class PollListCreateView(generics.ListCreateAPIView):
     queryset = Poll.objects.all()
@@ -77,6 +75,54 @@ class PollResultsView(APIView):
             return Response(results, status=status.HTTP_200_OK)
         except Poll.DoesNotExist:
             return Response({"detail": "Poll not found."}, status=status.HTTP_404_NOT_FOUND)
+
+class PollUpdateView(generics.UpdateAPIView):
+    queryset = Poll.objects.all()
+    serializer_class = PollSerializer
+    lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        poll = self.get_object()
+        
+        # Retrieve and update only the fields that are passed in the request body
+        data = request.data
+        poll.title = data.get('title', poll.title)
+        poll.description = data.get('description', poll.description)
+        poll.expires_at = data.get('expires_at', poll.expires_at)
+
+        poll.save()
+
+        # Return response with updated poll
+        return Response(PollSerializer(poll).data, status=status.HTTP_200_OK)
+
+class OptionUpdateView(generics.UpdateAPIView):
+    queryset = Option.objects.all()
+    serializer_class = OptionSerializer
+    lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        option = self.get_object()
+        
+        # Retrieve and update only the 'text' field for the option
+        data = request.data
+        option.text = data.get('text', option.text)
+        
+        option.save()
+
+        # Return response with updated option
+        return Response(OptionSerializer(option).data, status=status.HTTP_200_OK)
+
+class OptionDeleteView(generics.DestroyAPIView):
+    queryset = Option.objects.all()
+    lookup_field = 'id'
+
+    def delete(self, request, *args, **kwargs):
+        # Get the option object
+        option = self.get_object()
+        # Delete the option
+        option.delete()
+        # Return response indicating success
+        return Response({"detail": "Option deleted successfully!"}, status=status.HTTP_204_NO_CONTENT)
 
 class PollDeleteView(APIView):
     def delete(self, request, poll_id):
