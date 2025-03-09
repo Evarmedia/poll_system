@@ -40,6 +40,7 @@ class OptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Option
         fields = ('id', 'text')
+        ref_name = 'OptionSerializer'
 
 
 class VoteSerializer(serializers.Serializer):
@@ -52,6 +53,7 @@ class PollSerializer(serializers.ModelSerializer):
     class Meta:
         model = Poll
         fields = ['id', 'title', 'description', 'expires_at', 'options']
+        ref_name = 'PollSerializer'
 
     def create(self, validated_data):
         # Pop the 'options' field from validated_data to handle it separately
